@@ -35,17 +35,17 @@ while True:
 
     html = ''
     try:
-        r = requests.get('http://weather.sina.com.cn/shanghai', timeout=10)
+        r = requests.get('http://weather.sina.com.cn/huoshan', timeout=10)
         r.encoding = 'utf-8'
         html = r.text
     except Exception, e:
         fail_exit(unicode(e))
 
     result = {field: None for field in '''city_name current_temp current_weather
-              current_wind current_humidity current_aq current_aq_desc
+              current_wind current_humidity 
               today_weather today_temp_low today_temp_hig tomorrow_weather
-              tomorrow_temp_low tomorrow_temp_hig tomorrow_wind tomorrow_aq
-              tomorrow_aq_desc'''.split()}
+              tomorrow_temp_low tomorrow_temp_hig tomorrow_wind 
+               '''.split()}
 
     tree = etree.HTML(html)
     rt = tree.xpath('//*[@id="slider_ct_name"]')
@@ -67,13 +67,13 @@ while True:
         tmp0 = None
         tmp1 = None
 
-    rt = tree.xpath('//*[@id="slider_w"]/div[1]/div/div[4]/div/div[1]/p')
-    if rt:
-        result['current_aq'] = rt[0].text
-
-    rt = tree.xpath('//*[@id="slider_w"]/div[1]/div/div[4]/div/div[2]/p[1]')
-    if rt:
-        result['current_aq_desc'] = rt[0].text
+    # rt = tree.xpath('//*[@id="slider_w"]/div[1]/div/div[4]/div/div[1]/p')
+    # if rt:
+    #     result['current_aq'] = rt[0].text
+    #
+    # rt = tree.xpath('//*[@id="slider_w"]/div[1]/div/div[4]/div/div[2]/p[1]')
+    # if rt:
+    #     result['current_aq_desc'] = rt[0].text
 
     rt = tree.xpath('//*[@id="blk_fc_c0_scroll"]/div[1]/p[3]/img')
     if len(rt) == 1:
@@ -119,12 +119,12 @@ while True:
         result['tomorrow_wind'] = rt[0].text.strip()
 
     rt = tree.xpath('//*[@id="blk_fc_c0_scroll"]/div[2]/ul/li')
-    if rt:
-        result['tomorrow_aq'] = rt[0].text
-        result['tomorrow_aq_desc'] = rt[1].text
+    # if rt:
+    #     result['tomorrow_aq'] = rt[0].text
+    #     result['tomorrow_aq_desc'] = rt[1].text
 
     keys_require = '''city_name current_temp current_weather current_wind
-        current_humidity current_aq current_aq_desc today_weather
+        current_humidity today_weather
         today_temp_low tomorrow_weather tomorrow_temp_low tomorrow_temp_hig
         tomorrow_wind'''.split()
 
@@ -164,8 +164,8 @@ while True:
     temp_x = 0
     time_now = datetime.datetime.now()
     time_string = time_now.strftime('%H:%M')
-    date_string = time_now.strftime('%Y-%m-%d')
-    week_string = [u'一',u'二',u'三',u'四',u'五',u'六',u'日'][time_now.isoweekday() - 1]
+    date_string = time_now.strftime('%m-%d')
+    week_string = [u'星期一',u'星期二',u'星期三',u'星期四',u'星期五',u'星期六',u'星期日'][time_now.isoweekday() - 1]
     if time_string[0] == '0':
         time_string = time_string[1:]
         temp_x += 40
@@ -177,8 +177,8 @@ while True:
 
     screen.set_ch_font_size(FONT_SIZE_48) #48
     screen.set_en_font_size(FONT_SIZE_48) #48
-    screen.text(clock_x + 370 + 140, clock_y + 10, date_string)
-    screen.text(clock_x + 530 + 170, clock_y + 70, week_string)
+    screen.text(clock_x + 370 + 235, clock_y + 10, date_string)
+    screen.text(clock_x + 530 + 70, clock_y + 70, week_string)
     #size and position of date and week on the top wright conner
 
     screen.line(0, clock_y + 160, 800, clock_y + 160)
@@ -218,7 +218,7 @@ while True:
             bmp_name = 'WWU.BMP'
 
     if bmp_name:
-        screen.bitmap(20, clock_y + 240, bmp_name)
+        screen.bitmap(10, clock_y + 170, bmp_name)
 
     screen.set_ch_font_size(FONT_SIZE_48)
     screen.set_en_font_size(FONT_SIZE_48)
@@ -232,14 +232,14 @@ while True:
     weather_line4_height = 64
     weather_text_x = 256 - 30
     weather_line5_x = weather_text_x + 64
-    if len(wdata['current_aq_desc']) > 2:
-        weather_line5_x -= 80
+    # if len(wdata['current_aq_desc']) > 2:
+    #     weather_line5_x -= 80
 
-    screen.text(weather_text_x + 64, weather_y + margin_top, wdata['today_weather'])
-
+    # screen.text(weather_text_x - 200, weather_y + 140 + margin_top, wdata['today_weather'])
+    # the text for weather condition
     tmp0 = u'{current_temp}℃   {current_humidity} %'.format(**wdata)
     tmp0 = tmp0.replace('1', '1 ')
-    screen.text(weather_text_x + 64, weather_y + margin_top +
+    screen.text(weather_text_x + 55, weather_y -125 + margin_top +
                 weather_line1_height +
                 weather_line_spacing +
                 weather_line2_height +
@@ -251,7 +251,7 @@ while True:
         if int(time.time()) - hdata['update'] < 120:
             tmp0 = u'{temp}℃   {humidity} %'.format(**hdata)
             tmp0 = tmp0.replace('1', '1 ')
-            screen.text(weather_text_x + 64, weather_y + margin_top +
+            screen.text(weather_text_x + 55, weather_y -130 + margin_top +
                         weather_line1_height +
                         weather_line_spacing +
                         weather_line2_height +
@@ -261,53 +261,53 @@ while True:
     except Exception, e:
         pass
 
-    screen.text(weather_line5_x, weather_y + margin_top +
-                weather_line1_height +
-                weather_line_spacing +
-                weather_line2_height +
-                weather_line_spacing +
-                weather_line3_height +
-                weather_line_spacing +
-                weather_line4_height +
-                weather_line_spacing,
-                u'{current_aq} {current_aq_desc}'.format(**wdata))
+    # screen.text(weather_line5_x, weather_y + margin_top +
+    #             weather_line1_height +
+    #             weather_line_spacing +
+    #             weather_line2_height +
+    #             weather_line_spacing +
+    #             weather_line3_height +
+    #             weather_line_spacing +
+    #             weather_line4_height +
+    #             weather_line_spacing,
+    #             u'{current_aq} {current_aq_desc}'.format(**wdata))
 
     screen.set_ch_font_size(FONT_SIZE_32)
     screen.set_en_font_size(FONT_SIZE_32)
 
-    screen.text(weather_text_x + 64 - 20 - screen.get_text_width(wdata['city_name'], FONT_SIZE_32),
-                weather_y + margin_top + 10, wdata['city_name'])
+    # screen.text(weather_text_x + 64 - 20 - screen.get_text_width(wdata['city_name'], FONT_SIZE_32),
+    #             weather_y + margin_top + 10, wdata['city_name'])
 
-    screen.text(weather_text_x - 20, weather_y + margin_top +
+    screen.text(weather_text_x - 40, weather_y - 125 + margin_top +
                 weather_line1_height +
                 weather_line_spacing +
                 weather_line2_height +
-                weather_line_spacing + 10, u'室外')
+                weather_line_spacing + 10, u'室外:')
 
-    screen.text(weather_text_x - 20, weather_y + margin_top +
-                weather_line1_height +
-                weather_line_spacing +
-                weather_line2_height +
-                weather_line_spacing +
-                weather_line3_height +
-                weather_line_spacing + 10, u'室内')
-
-    screen.text(weather_line5_x - 64 * 2 - 20, weather_y + margin_top +
+    screen.text(weather_text_x - 40, weather_y -135 + margin_top +
                 weather_line1_height +
                 weather_line_spacing +
                 weather_line2_height +
                 weather_line_spacing +
                 weather_line3_height +
-                weather_line_spacing +
-                weather_line4_height +
-                weather_line_spacing + 10, u'空气指数')
+                weather_line_spacing + 10, u'室内:')
+
+    # screen.text(weather_line5_x - 64 * 2 - 20, weather_y + margin_top +
+    #             weather_line1_height +
+    #             weather_line_spacing +
+    #             weather_line2_height +
+    #             weather_line_spacing +
+    #             weather_line3_height +
+    #             weather_line_spacing +
+    #             weather_line4_height +
+    #             weather_line_spacing + 10, u'空气指数')
 
     if wdata.get('today_temp_hig'):
-        fmt = u'{today_temp_hig}~{today_temp_low}℃ {current_wind}'
+        fmt = u'{today_temp_hig}~{today_temp_low}℃  '
     else:
-        fmt = u'{today_temp_low}℃ {current_wind}'
+        fmt = u'{today_temp_low}℃ '
     msg = fmt.format(**wdata)
-    screen.text(weather_text_x + 64, weather_y + margin_top
+    screen.text(weather_text_x -180, weather_y +60 + margin_top
                 + weather_line1_height + weather_line_spacing + 5, msg)
     weather2_x = 550
     weather2_y = (weather_y + margin_top +
@@ -318,22 +318,52 @@ while True:
 
     box_height = 200
     box_width = screen_width - 20 - weather2_x
-    screen.line(weather2_x, weather2_y, screen_width - 20, weather2_y)
-    screen.line(weather2_x, weather2_y + 48 + 10, screen_width - 20, weather2_y + 48 + 10)
-    screen.line(weather2_x, weather2_y, weather2_x, weather2_y + box_height)
-    screen.line(screen_width - 20, weather2_y, screen_width - 20, weather2_y + box_height)
-    screen.line(weather2_x, weather2_y + box_height, screen_width - 20, weather2_y + box_height)
+    #create a virtul box for text for weather tomorrow
+    # screen.line(weather2_x, weather2_y, screen_width - 20, weather2_y)
+    # screen.line(weather2_x, weather2_y + 48 + 10, screen_width - 20, weather2_y + 48 + 10)
+    # screen.line(weather2_x, weather2_y, weather2_x, weather2_y + box_height)
+    # screen.line(screen_width - 20, weather2_y, screen_width - 20, weather2_y + box_height)
+    # screen.line(weather2_x, weather2_y + box_height, screen_width - 20, weather2_y + box_height)
 
     screen.set_ch_font_size(FONT_SIZE_32)
     screen.set_en_font_size(FONT_SIZE_32)
-    screen.text(weather2_x + 50, weather2_y + 12, u'明日预告')
+    screen.text(weather2_x + 10, weather2_y -140, u'[ 明日预告 ]')
 
-    fmt = u'{tomorrow_weather},  {tomorrow_temp_hig} ~ {tomorrow_temp_low}℃   {tomorrow_wind}'
+    fmt = u'{tomorrow_weather}         {tomorrow_temp_hig} ~ {tomorrow_temp_low}℃          {tomorrow_wind}'
     msg = fmt.format(**wdata)
-    if wdata.get('tomorrow_aq'):
-        msg += u' AQI {tomorrow_aq}  {tomorrow_aq_desc}'.format(**wdata)
-    screen.wrap_text(weather2_x + 8, weather2_y + 48 + 20, box_width, msg)
+    # if wdata.get('tomorrow_aq'):
+    #     msg += u' AQI {tomorrow_aq}  {tomorrow_aq_desc}'.format(**wdata)
+    screen.wrap_text(weather2_x + 8, weather2_y + 48 + 20 -160, box_width, msg)
+
+# news feather
+    screen.line(0, clock_y + 380, 800, clock_y + 380)
+    screen.line(0, clock_y + 381, 800, clock_y + 381)
+
+    import feedparser
+    skynews = feedparser.parse('http://feeds.skynews.com/feeds/rss/world.xml')
+    s1 = skynews['entries'][0]['title']
+    s2 = skynews['entries'][1]['title']
+
+    bbcnews = feedparser.parse('http://feeds.bbci.co.uk/news/world/rss.xml')
+    b1 = bbcnews['entries'][0]['title']
+    b2 = bbcnews['entries'][1]['title']
+
+    screen.set_ch_font_size(FONT_SIZE_32)
+    screen.set_en_font_size(FONT_SIZE_32)
+    screen.text(weather2_x -520, weather2_y +80, s1)
+
+    screen.set_ch_font_size(FONT_SIZE_32)
+    screen.set_en_font_size(FONT_SIZE_32)
+    screen.text(weather2_x - 520, weather2_y + 125, s2)
+
+    screen.set_ch_font_size(FONT_SIZE_32)
+    screen.set_en_font_size(FONT_SIZE_32)
+    screen.text(weather2_x - 520, weather2_y + 170, b1)
+
+    screen.set_ch_font_size(FONT_SIZE_32)
+    screen.set_en_font_size(FONT_SIZE_32)
+    screen.text(weather2_x - 520, weather2_y + 215, b2)
 
     screen.update()
     screen.disconnect()
-    time.sleep(2)
+    time.sleep(100)

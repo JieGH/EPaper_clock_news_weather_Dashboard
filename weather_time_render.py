@@ -196,5 +196,6 @@ if wdata.get('tomorrow_aq'):
     msg += u', AQI {tomorrow_aq}{tomorrow_aq_desc}'.format(**wdata)
 screen.wrap_text(weather2_x + 8, weather2_y + 48 + 20, box_width, msg)
 
+screen.text('kdsdsfkdsfakldasfpyt')
 screen.update()
 screen.disconnect()
