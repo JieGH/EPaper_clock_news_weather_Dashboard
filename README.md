@@ -1,2 +1,2 @@
 
-![the clock](https://raw.github.com/emptyhua/epaper_clock/master/the_clock_0.jpg)
+![the clock](https://raw.githubusercontent.com/JieGH/EPaper_clock_news_weather_Dashboard/master/beta1.jpg)
